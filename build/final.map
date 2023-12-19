@@ -1503,11 +1503,11 @@ Linker script and memory map
 
 .rodata         0x0200778c     0x59c0
  *(EXCLUDE_FILE(*.twl*) .rodata)
- .rodata        0x0200778c        0xe main.o
+ .rodata        0x0200778c        0xf main.o
  *all.rodata*(*)
  *(EXCLUDE_FILE(*.twl*) .roda)
  *(EXCLUDE_FILE(*.twl*) .rodata.*)
- *fill*         0x0200779a        0x2 ff
+ *fill*         0x0200779b        0x1 ff
  .rodata.con_write.str1.4
                 0x0200779c       0x98 /opt/devkitpro/libnds/lib/libnds9.a(console.o)
                                  0x30 (size before relaxing)

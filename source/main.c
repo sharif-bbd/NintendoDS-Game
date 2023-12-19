@@ -9,7 +9,7 @@
 int main(void) {
 	
     consoleDemoInit();
-    printf("\nTemplate nds\n");
+    printf("I made changes\n");
 
     while(1)
         swiWaitForVBlank();	
