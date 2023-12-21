@@ -8,19 +8,38 @@
 #include "battle.h"
 #include "skills.h"
 
+#include <maxmod9.h>
+#include "soundbank.h"
+#include "soundbank_bin.h"
+
 int main(void) {
 	
     consoleDemoInit();
-    //printf("I made changes\n");
+
+
+
+	//////set music//////
+	mmInitDefaultMem((mm_addr)soundbank_bin);
+
+	//Load module
+	mmLoad(MOD_MUSIC);
+	mmLoad(MOD_POKECENTER);
+	//Load effect
+	//mmLoadEffect(SFX_RESULT);
 
     ///////Upper Image setting////////
 
+    // Enable and configure VRAM A for MAIN
 	VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
 
+	//Engine configuration in Rotoscale mode
 	REG_DISPCNT = MODE_5_2D | DISPLAY_BG2_ACTIVE;
 
+	//Confiure background
 	BGCTRL[2]= BG_MAP_BASE(0) | BgSize_B8_256x256;
 
+
+	//Transfer tiles to VRAM
 	swiCopy(battlePal, BG_PALETTE, battlePalLen/2);
 	swiCopy(battleBitmap, BG_GFX, battleBitmapLen/2);
 
@@ -35,17 +54,58 @@ int main(void) {
 
 
     ///////Lower Background setting////////
-    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
 
-    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+	// Enable and configure VRAM C for SUB
 
-    BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+//    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+//
+//    //Engine configuration in tile mode
+//    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+//
+//    //Confiure background
+//    BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+//
+//    // Transfer tiles to VRAM (chosen tile base)
+//    swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen/2);
+//    swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen/2);
+//
+//    swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen/2);
 
-    swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen/2);
-    swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen/2);
 
-    swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen/2);
+    /////////Configure touch screens////////
 
+	for(;;) {
+		swiWaitForVBlank();
+		scanKeys();
+		unsigned held = keysHeld();
+		if (held & KEY_TOUCH) {
+			touchPosition touch;
+			touchRead(&touch);
+			if((touch.px>= 31) && (touch.px <= 161) ){
+				printf("\x1b[6;5HTouch x = %04X, %04X\n",
+							touch.rawx, touch.px);
+				    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+
+				    //Engine configuration in tile mode
+				    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+
+				    //Confiure background
+				    BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+
+				    // Transfer tiles to VRAM (chosen tile base)
+				    swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen/2);
+				    swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen/2);
+
+				    swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen/2);
+
+
+				    mmStart(MOD_POKECENTER,MM_PLAY_LOOP);
+			}
+			else{
+				printf("you're out of the zone");
+			}
+		}
+	}
 
 
 
@@ -65,3 +125,5 @@ int main(void) {
 
 
 }
+
+//up left box: x= 0~123, y= 28~76
