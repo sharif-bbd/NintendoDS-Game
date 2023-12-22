@@ -5,9 +5,11 @@
 
 #include <nds.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "battle.h"
 #include "skills.h"
 #include "menu.h"
+#include "gameover.h"
 
 #include <maxmod9.h>
 #include "soundbank.h"
@@ -79,6 +81,7 @@ int main(void) {
 
 
     /////////Configure touch screens////////
+	bool inMenu = false;
 
 	for(;;) {
 		swiWaitForVBlank();
@@ -111,25 +114,13 @@ int main(void) {
 
 
 				    mmStart(MOD_POKECENTER,MM_PLAY_LOOP);
-
-
-
-
-
-
 			}
-
-			else{
-				printf("y");
-			}
-
-
-
 
 
 		}
 		else if (keys & KEY_A){
-						printf("y");
+
+			inMenu = true;
 
 						VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
 
@@ -144,7 +135,32 @@ int main(void) {
 						swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen/2);
 
 						swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen/2);
-					}
+
+
+				}
+
+		if ((keys & KEY_Y) && (inMenu = true)){
+
+									touchPosition touch;
+
+									touchRead(&touch);
+
+									//if((touch.px>= 1) && (touch.px <= 20)&&(touch.py >= 150) ){
+
+		//								VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+		//
+		//
+		//								REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+		//
+		//
+		//								BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+
+										swiCopy(gameoverPal, BG_PALETTE_SUB, gameoverPalLen/2);
+										swiCopy(gameoverTiles, BG_TILE_RAM_SUB(1), gameoverTilesLen/2);
+
+										swiCopy(gameoverMap, BG_MAP_RAM_SUB(0), gameoverMapLen/2);
+									//}
+								}
 	}
 
 
