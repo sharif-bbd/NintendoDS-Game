@@ -88,7 +88,7 @@ int main(void) {
 		u16 keys = keysDown();
 
 		//if (keys&KEY_A){printf("A");}
-		if (held & KEY_TOUCH) {
+		if (keys & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
