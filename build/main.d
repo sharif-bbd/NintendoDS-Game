@@ -62,6 +62,7 @@ main.o: \
  /opt/devkitpro/libnds/include/nds/arm9/nand.h \
  /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/battle.h \
  /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/skills.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/menu.h \
  /opt/devkitpro/libnds/include/maxmod9.h \
  /opt/devkitpro/libnds/include/mm_types.h \
  /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/soundbank.h \
@@ -128,6 +129,7 @@ main.o: \
 /opt/devkitpro/libnds/include/nds/arm9/nand.h:
 /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/battle.h:
 /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/skills.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/menu.h:
 /opt/devkitpro/libnds/include/maxmod9.h:
 /opt/devkitpro/libnds/include/mm_types.h:
 /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/soundbank.h:
