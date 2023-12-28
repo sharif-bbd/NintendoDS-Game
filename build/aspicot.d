@@ -1,0 +1,1 @@
+aspicot.o: aspicot.s

@@ -7,16 +7,41 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "battle.h"
+#include "findDiff.h"
 #include "skills.h"
 #include "menu.h"
 #include "gameover.h"
+#include "instruction.h"
 
 #include <maxmod9.h>
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
+#include "aspicot.h"
+
+#define SCREEN_WIDTH	256
+#define	SCREEN_HEIGHT	192
+
+#define	SPRITE_WIDTH	64
+#define	SPRITE_HEIGHT	64
+
+u16* gfx;
 
 
+void configureSprites() {
+	//Set up memory bank to work in sprite mode (offset since we are using VRAM A for backgrounds)
+	VRAM_B_CR = VRAM_ENABLE | VRAM_B_MAIN_SPRITE_0x06400000;
+
+	//Initialize sprite manager and the engine
+	oamInit(&oamMain, SpriteMapping_1D_32, false);
+
+	//Allocate space for the graphic to show in the sprite
+	gfx = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_256Color);
+
+	//Copy data for the graphic (palette and bitmap)
+	swiCopy(aspicotPal, SPRITE_PALETTE, aspicotPalLen/2);
+	swiCopy(aspicotTiles, gfx, aspicotTilesLen/2);
+}
 
 
 int main(void) {
@@ -59,7 +84,6 @@ int main(void) {
 	bgTransform[2]->dy = 0*256;
 
 
-
     ///////Lower Background setting////////
 
 	// Enable and configure VRAM C for SUB
@@ -90,14 +114,15 @@ int main(void) {
 		unsigned held = keysHeld();
 		u16 keys = keysDown();
 
-		//if (keys&KEY_A){printf("A");}
+		configureSprites();
+
+
 		if (keys & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
-			if((touch.px>= 31) && (touch.px <= 161) ){
-				printf("\x1b[6;5HTouch x = %04X, %04X\n",
-							touch.rawx, touch.px);
+			if((touch.px>= 0) && (touch.px <= 256) ){
+
 				    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
 
 				    //Engine configuration in tile mode
@@ -114,7 +139,63 @@ int main(void) {
 
 
 				    mmStart(MOD_POKECENTER,MM_PLAY_LOOP);
+
+
+
+				    if((touch.px>=2) && (touch.px<=123) && (touch.py >=28) && (touch.py <=76) ){
+					int x = 0, y = 0;
+					swiCopy(instructionPal, BG_PALETTE_SUB, instructionPalLen/2);
+					swiCopy(instructionTiles, BG_TILE_RAM_SUB(1), instructionTilesLen/2);
+					swiCopy(instructionMap, BG_MAP_RAM_SUB(0), instructionMapLen/2);
+									        while(1){
+									        	//Read held keys
+									        	scanKeys();
+									        	keys = keysHeld();
+
+									        	//Modify position of the sprite accordingly
+									        	if((keys & KEY_RIGHT) && (x < (SCREEN_WIDTH - SPRITE_WIDTH))) x+=2;
+									        	if((keys & KEY_DOWN) && (y < (SCREEN_HEIGHT - SPRITE_HEIGHT))) y+=2;
+									        	if((keys & KEY_LEFT) && (x  > 0)) x-=2;
+									        	if((keys & KEY_UP) && (y  > 0)) y-=2;
+
+									        	oamSet(&oamMain, 	// oam handler
+									        		0,				// Number of sprite
+									        		x, y,			// Coordinates
+									        		0,				// Priority
+									        		0,				// Palette to use
+									        		SpriteSize_32x32,			// Sprite size
+									        		SpriteColorFormat_256Color,	// Color format
+									        		gfx,			// Loaded graphic to display
+									        		-1,				// Affine rotation to use (-1 none)
+									        		false,			// Double size if rotating
+									        		false,			// Hide this sprite
+									        		false, false,	// Horizontal or vertical flip
+									        		false			// Mosaic
+									        		);
+									        	swiWaitForVBlank();
+
+									        	//Update the sprites
+									    		oamUpdate(&oamMain);
+									    		if(keys & KEY_X){
+									    			swiCopy(menuPal, BG_PALETTE_SUB, menuPalLen/2);
+									    			swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen/2);
+									    			swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen/2);
+									    			break;
+									    		}
+									        }
+				    }
+				    if((touch.px>=133) && (touch.px<=251) && (touch.py >=28) && (touch.py <=76) ){
+
+
+				    						swiCopy(findDiffPal, BG_PALETTE_SUB, findDiffPalLen/2);
+				    											swiCopy(findDiffTiles, BG_TILE_RAM_SUB(1), findDiffTilesLen/2);
+				    											swiCopy(findDiffMap, BG_MAP_RAM_SUB(0), findDiffMapLen/2);
+
+
+				    							}
 			}
+
+
 
 
 		}
@@ -159,7 +240,8 @@ int main(void) {
 										swiCopy(gameoverTiles, BG_TILE_RAM_SUB(1), gameoverTilesLen/2);
 
 										swiCopy(gameoverMap, BG_MAP_RAM_SUB(0), gameoverMapLen/2);
-									//}
+										mmStop();
+									//
 								}
 	}
 
