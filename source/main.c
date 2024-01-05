@@ -13,6 +13,7 @@
 #include "menu.h"
 #include "gameover.h"
 #include "instruction.h"
+#include "numbers.h"
 
 #include <maxmod9.h>
 #include "soundbank.h"
@@ -27,7 +28,115 @@
 #define	SPRITE_HEIGHT	64
 
 u16 *gfx;
+int min, sec, msec;
 
+void timer_ISR(){
+	if(msec >= 999){
+		msec = 0;
+		if(sec >= 59){
+			sec = 0;
+			min += 1;
+		}else{
+			sec +=1;
+		}
+	}else{
+		msec += 1;
+	}
+	return;
+}
+
+void printDigit(u16* map, int number, int x, int y){
+	int i,j;
+
+	if(number >= 0 && number < 10){
+		for(i = 0; i<8;i++){
+			for(j = 0; j<4; j++){
+				map[(i + y)*32+j+x] = (number >= 0) ? (u16)(i*4+j)+32*number : 32;
+			}
+
+		}
+	}
+}
+
+void updateChronoDisp(u16* map,int min, int sec, int msec)
+{
+	int x = 0, y = 0;
+	int number;
+	int tile, i, j;
+
+	//Clear the map
+	for(tile = 0; tile <1024; tile++){
+		map[tile] = 32;
+	}
+
+	/*****MINUTES******/
+	number = min;
+	if(min > 59) min = number = -1;
+	//First digit
+	x = 0; y = 8;
+	if(min>=0) number = min/10;
+	printDigit(map, number, x,y);
+	//Second digit
+	x = 4; y = 8;
+	if(min>=0) number = min %10;
+	printDigit(map, number, x,y);
+
+	/*****COLON******/
+	x = 8; y = 8;
+	for(i = 0; i<8;i++){
+		for(j = 0; j<2; j++){
+			map[(i + y)*32+j+x] = (u16)(i*4+j)+32*10+2;
+		}
+	}
+
+	/*****SECONDS******/
+	number = sec;
+	if(sec > 59) sec = number = -1;
+	//First digit
+	x = 10; y = 8;
+	if(sec>=0) number = sec / 10;
+	printDigit(map, number, x,y);
+	//Second digit
+	x = 14; y = 8;
+	if(sec>=0) number = sec % 10;
+	printDigit(map, number, x,y);
+
+	/*****POINT MSEC******/
+	x = 18; y = 8;
+	for(i = 0; i<8;i++){
+		for(j = 0; j<2; j++){
+			map[(i + y)*32+j+x] = (u16)(i*4+j)+32*10;
+		}
+	}
+
+	/*****M.SECONDS******/
+	number = msec;
+	if(msec > 999) msec = number = -1;
+	//First digit
+	x = 20; y = 8;
+	if(msec>=0) number = msec / 100;
+	printDigit(map, number, x,y);
+
+	//Second digit
+	x = 24; y = 8;
+	if(msec>=0) number = (msec % 100) / 10;
+	printDigit(map, number, x,y);
+
+	//Third digit
+	x = 28; y = 8;
+	if(msec>=0) number = (msec % 10) % 10;
+	printDigit(map, number, x,y);
+}
+void setup_timer(){
+	min = 0;
+	sec = 0;
+	msec = 0;
+	irqSet(IRQ_TIMER0, &timer_ISR);
+	TIMER_DATA(0) = TIMER_FREQ_64(1000);
+	TIMER_CR(0) = TIMER_ENABLE | TIMER_DIV_64 | TIMER_IRQ_REQ;
+
+	irqEnable(IRQ_TIMER0);
+}
 void configureSprites() {
 	//Set up memory bank to work in sprite mode (offset since we are using VRAM A for backgrounds)
 	VRAM_B_CR = VRAM_ENABLE | VRAM_B_MAIN_SPRITE_0x06400000;
@@ -73,6 +182,7 @@ int main(void) {
 	//Transfer tiles to VRAM
 	swiCopy(battlePal, BG_PALETTE, battlePalLen / 2);
 	swiCopy(battleBitmap, BG_GFX, battleBitmapLen / 2);
+
 
 	bgTransform[2]->hdx = 1 * 256;
 	bgTransform[2]->vdx = 0 * 256;
@@ -282,6 +392,14 @@ int main(void) {
 			//
 			//
 			//								BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+
+			REG_DISPCNT = MODE_5_2D | DISPLAY_BG1_ACTIVE;
+			BGCTRL[1] = BG_32x32 | BG_COLOR_256 | BG_TILE_BASE(1) | BG_MAP_BASE(0);
+
+			swiCopy(numbersPal, BG_PALETTE, numbersPalLen/2);
+			swiCopy(numbersTiles, BG_TILE_RAM(1), numbersTilesLen/2);
+
+			updateChronoDisp(BG_MAP_RAM(0), 0,  0, 0);
 
 			swiCopy(gameoverPal, BG_PALETTE_SUB, gameoverPalLen / 2);
 			swiCopy(gameoverTiles, BG_TILE_RAM_SUB(1), gameoverTilesLen / 2);

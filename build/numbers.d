@@ -1,0 +1,1 @@
+numbers.o: numbers.s
