@@ -6,6 +6,7 @@
 #include <nds.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "start.h"
 #include "battle.h"
 #include "findDiff.h"
 #include "skills.h"
@@ -25,8 +26,7 @@
 #define	SPRITE_WIDTH	64
 #define	SPRITE_HEIGHT	64
 
-u16* gfx;
-
+u16 *gfx;
 
 void configureSprites() {
 	//Set up memory bank to work in sprite mode (offset since we are using VRAM A for backgrounds)
@@ -36,59 +36,70 @@ void configureSprites() {
 	oamInit(&oamMain, SpriteMapping_1D_32, false);
 
 	//Allocate space for the graphic to show in the sprite
-	gfx = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_256Color);
+	gfx = oamAllocateGfx(&oamMain, SpriteSize_32x32,
+			SpriteColorFormat_256Color);
 
 	//Copy data for the graphic (palette and bitmap)
-	swiCopy(aspicotPal, SPRITE_PALETTE, aspicotPalLen/2);
-	swiCopy(aspicotTiles, gfx, aspicotTilesLen/2);
+	swiCopy(aspicotPal, SPRITE_PALETTE, aspicotPalLen / 2);
+	swiCopy(aspicotTiles, gfx, aspicotTilesLen / 2);
 }
 
 
 int main(void) {
-	
+
 	consoleDemoInit();
 
-
-
 	//////set music//////
-	mmInitDefaultMem((mm_addr)soundbank_bin);
+	mmInitDefaultMem((mm_addr) soundbank_bin);
 
 	//Load module
 	//mmLoad(MOD_MUSIC);
 	mmLoad(MOD_POKECENTER);
 	//Load effect
 	mmLoadEffect(SFX_RESULT);
+	bool inMenu = false;
 
-    ///////Upper Image setting////////
+	///////Upper Image setting////////
 
-    // Enable and configure VRAM A for MAIN
+	// Enable and configure VRAM A for MAIN
 	VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
 
 	//Engine configuration in Rotoscale mode
 	REG_DISPCNT = MODE_5_2D | DISPLAY_BG2_ACTIVE;
 
 	//Confiure background
-	BGCTRL[2]= BG_MAP_BASE(0) | BgSize_B8_256x256;
-
+	BGCTRL[2] = BG_MAP_BASE(0) | BgSize_B8_256x256;
 
 	//Transfer tiles to VRAM
-	swiCopy(battlePal, BG_PALETTE, battlePalLen/2);
-	swiCopy(battleBitmap, BG_GFX, battleBitmapLen/2);
+	swiCopy(battlePal, BG_PALETTE, battlePalLen / 2);
+	swiCopy(battleBitmap, BG_GFX, battleBitmapLen / 2);
 
+	bgTransform[2]->hdx = 1 * 256;
+	bgTransform[2]->vdx = 0 * 256;
+	bgTransform[2]->hdy = 0 * 256;
+	bgTransform[2]->vdy = 1 * 256;
+	bgTransform[2]->dx = 0 * 256;
+	bgTransform[2]->dy = 0 * 256;
 
-	bgTransform[2]->hdx = 1*256;
-	bgTransform[2]->vdx = 0*256;
-	bgTransform[2]->hdy = 0*256;
-	bgTransform[2]->vdy = 1*256;
-	bgTransform[2]->dx = 0*256;
-	bgTransform[2]->dy = 0*256;
-
-
-    ///////Lower Background setting////////
+	///////Lower Background setting////////
 
 	// Enable and configure VRAM C for SUB
 
 //    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+	VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+
+			//Engine configuration in tile mode
+			REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+
+			//Confiure background
+			BGCTRL_SUB[0] = BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1)
+					| BG_32x32;
+
+	swiCopy(menuPal, BG_PALETTE_SUB, menuPalLen / 2);
+				swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen / 2);
+
+				swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen / 2);
+
 //
 //    //Engine configuration in tile mode
 //    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
@@ -103,11 +114,10 @@ int main(void) {
 //
 //    swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen/2);
 
+	/////////Configure touch screens////////
 
-    /////////Configure touch screens////////
-	bool inMenu = false;
 
-	for(;;) {
+	for (;;) {
 		swiWaitForVBlank();
 		scanKeys();
 
@@ -115,152 +125,176 @@ int main(void) {
 		u16 keys = keysDown();
 
 		configureSprites();
+		//inMenu = false;
+
+		VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+
+		//Engine configuration in tile mode
+		REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+
+		//Confiure background
+		BGCTRL_SUB[0] = BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1)
+				| BG_32x32;
+
+		// Transfer tiles to VRAM (chosen tile base)
+//						    swiCopy(startPal, BG_PALETTE_SUB, startPalLen/2);
+//						    swiCopy(startTiles, BG_TILE_RAM_SUB(1), startTilesLen/2);
+//
+//						    swiCopy(startMap, BG_MAP_RAM_SUB(0), startMapLen/2);
+
 
 
 		if (keys & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
-			if((touch.px>= 0) && (touch.px <= 256) ){
+			if ((touch.px >= 26) && (touch.px <= 229) && (touch.py >= 43) && (touch.py <= 125)) {
+				//while(1){
 
-				    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+//				    VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+//
+//				    //Engine configuration in tile mode
+//				    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+//
+//				    //Confiure background
+//				    BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
 
-				    //Engine configuration in tile mode
-				    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+				// Transfer tiles to VRAM (chosen tile base)
+				swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen / 2);
+				swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen / 2);
 
-				    //Confiure background
-				    BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+				swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen / 2);
 
-				    // Transfer tiles to VRAM (chosen tile base)
-				    swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen/2);
-				    swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen/2);
+				mmStart(MOD_POKECENTER, MM_PLAY_LOOP);
 
-				    swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen/2);
+				if ((touch.px >= 2) && (touch.px <= 123) && (touch.py >= 28)
+						&& (touch.py <= 76)) {
 
+					int x = 90, y = 100;
+					swiCopy(instructionPal, BG_PALETTE_SUB,
+							instructionPalLen / 2);
+					swiCopy(instructionTiles, BG_TILE_RAM_SUB(1),
+							instructionTilesLen / 2);
+					swiCopy(instructionMap, BG_MAP_RAM_SUB(0),
+							instructionMapLen / 2);
+					while (1) {
+						//Read held keys
+						scanKeys();
+						keys = keysHeld();
 
-				    mmStart(MOD_POKECENTER,MM_PLAY_LOOP);
+						//Modify position of the sprite accordingly
+						if ((keys & KEY_RIGHT)
+								&& (x < (SCREEN_WIDTH - SPRITE_WIDTH)))
+							x += 2;
+						if ((keys & KEY_DOWN)
+								&& (y < (SCREEN_HEIGHT - SPRITE_HEIGHT)))
+							y += 2;
+						if ((keys & KEY_LEFT) && (x > 0))
+							x -= 2;
+						if ((keys & KEY_UP) && (y > 0))
+							y -= 2;
 
+						oamSet(&oamMain, 	// oam handler
+								0,				// Number of sprite
+								x, y,			// Coordinates
+								0,				// Priority
+								0,				// Palette to use
+								SpriteSize_32x32,			// Sprite size
+								SpriteColorFormat_256Color,	// Color format
+								gfx,			// Loaded graphic to display
+								-1,			// Affine rotation to use (-1 none)
+								false,			// Double size if rotating
+								false,			// Hide this sprite
+								false, false,	// Horizontal or vertical flip
+								false			// Mosaic
+								);
+						swiWaitForVBlank();
 
+						//Update the sprites
+						oamUpdate(&oamMain);
+						if (keys & KEY_X) {
+							swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen / 2);
+											swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen / 2);
 
-				    if((touch.px>=2) && (touch.px<=123) && (touch.py >=28) && (touch.py <=76) ){
-					int x = 0, y = 0;
-					swiCopy(instructionPal, BG_PALETTE_SUB, instructionPalLen/2);
-					swiCopy(instructionTiles, BG_TILE_RAM_SUB(1), instructionTilesLen/2);
-					swiCopy(instructionMap, BG_MAP_RAM_SUB(0), instructionMapLen/2);
-									        while(1){
-									        	//Read held keys
-									        	scanKeys();
-									        	keys = keysHeld();
+											swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen / 2);
+							break;
+						}
+					}
+				}
+				if ((touch.px >= 133) && (touch.px <= 251) && (touch.py >= 28)
+						&& (touch.py <= 76)) {
 
-									        	//Modify position of the sprite accordingly
-									        	if((keys & KEY_RIGHT) && (x < (SCREEN_WIDTH - SPRITE_WIDTH))) x+=2;
-									        	if((keys & KEY_DOWN) && (y < (SCREEN_HEIGHT - SPRITE_HEIGHT))) y+=2;
-									        	if((keys & KEY_LEFT) && (x  > 0)) x-=2;
-									        	if((keys & KEY_UP) && (y  > 0)) y-=2;
+					swiCopy(findDiffPal, BG_PALETTE_SUB, findDiffPalLen / 2);
+					swiCopy(findDiffTiles, BG_TILE_RAM_SUB(1),
+							findDiffTilesLen / 2);
+					swiCopy(findDiffMap, BG_MAP_RAM_SUB(0), findDiffMapLen / 2);
+					swiWaitForVBlank();
+					while (1) {
+						scanKeys();
+						keys = keysHeld();
+						if (keys & KEY_X) {
+							swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen / 2);
+											swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen / 2);
+											swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen / 2);
+							break;
+						}
+					}
 
-									        	oamSet(&oamMain, 	// oam handler
-									        		0,				// Number of sprite
-									        		x, y,			// Coordinates
-									        		0,				// Priority
-									        		0,				// Palette to use
-									        		SpriteSize_32x32,			// Sprite size
-									        		SpriteColorFormat_256Color,	// Color format
-									        		gfx,			// Loaded graphic to display
-									        		-1,				// Affine rotation to use (-1 none)
-									        		false,			// Double size if rotating
-									        		false,			// Hide this sprite
-									        		false, false,	// Horizontal or vertical flip
-									        		false			// Mosaic
-									        		);
-									        	swiWaitForVBlank();
-
-									        	//Update the sprites
-									    		oamUpdate(&oamMain);
-									    		if(keys & KEY_X){
-									    			swiCopy(menuPal, BG_PALETTE_SUB, menuPalLen/2);
-									    			swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen/2);
-									    			swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen/2);
-									    			break;
-									    		}
-									        }
-				    }
-				    if((touch.px>=133) && (touch.px<=251) && (touch.py >=28) && (touch.py <=76) ){
-
-
-				    						swiCopy(findDiffPal, BG_PALETTE_SUB, findDiffPalLen/2);
-				    											swiCopy(findDiffTiles, BG_TILE_RAM_SUB(1), findDiffTilesLen/2);
-				    											swiCopy(findDiffMap, BG_MAP_RAM_SUB(0), findDiffMapLen/2);
-
-
-				    							}
+				}
 			}
 
+			//}
 
-
-
-		}
-		else if (keys & KEY_A){
+		} else if (keys & KEY_Y) {
 
 			inMenu = true;
 
-						VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+//						VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+//
+//
+//						REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+//
+//
+//						BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
 
+			swiCopy(menuPal, BG_PALETTE_SUB, menuPalLen / 2);
+			swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen / 2);
 
-						REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+			swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen / 2);
 
+		}
 
-						BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
+		touchPosition touch;
+		touchRead(&touch);
+		if ((inMenu == true) && (touch.px >= 92) && (touch.px <= 163)
+				&& (touch.py >= 151) && (touch.py <= 190)) {
 
+			touchPosition touch;
 
-						swiCopy(menuPal, BG_PALETTE_SUB, menuPalLen/2);
-						swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen/2);
+			touchRead(&touch);
 
-						swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen/2);
+			//if((touch.px>= 1) && (touch.px <= 20)&&(touch.py >= 150) ){
 
+			//								VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+			//
+			//
+			//								REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
+			//
+			//
+			//								BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
 
-				}
+			swiCopy(gameoverPal, BG_PALETTE_SUB, gameoverPalLen / 2);
+			swiCopy(gameoverTiles, BG_TILE_RAM_SUB(1), gameoverTilesLen / 2);
 
-		if ((keys & KEY_Y) && (inMenu = true)){
-
-									touchPosition touch;
-
-									touchRead(&touch);
-
-									//if((touch.px>= 1) && (touch.px <= 20)&&(touch.py >= 150) ){
-
-		//								VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
-		//
-		//
-		//								REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
-		//
-		//
-		//								BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
-
-										swiCopy(gameoverPal, BG_PALETTE_SUB, gameoverPalLen/2);
-										swiCopy(gameoverTiles, BG_TILE_RAM_SUB(1), gameoverTilesLen/2);
-
-										swiCopy(gameoverMap, BG_MAP_RAM_SUB(0), gameoverMapLen/2);
-										mmStop();
-									//
-								}
+			swiCopy(gameoverMap, BG_MAP_RAM_SUB(0), gameoverMapLen / 2);
+			mmStop();
+			break;
+			//
+		}
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    while(1)
-            swiWaitForVBlank();
-
+	while (1)
+		swiWaitForVBlank();
 
 }
 

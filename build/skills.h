@@ -6,11 +6,11 @@
 //	skills, 256x192@8, 
 //	Transparent color : 00,00,00
 //	+ palette 256 entries, not compressed
-//	+ 366 tiles (t|f reduced) not compressed
+//	+ 406 tiles (t|f reduced) not compressed
 //	+ regular map (flat), not compressed, 32x24 
-//	Total size: 512 + 23424 + 1536 = 25472
+//	Total size: 512 + 25984 + 1536 = 28032
 //
-//	Time-stamp: 2023-12-28, 18:29:34
+//	Time-stamp: 2024-01-04, 18:16:33
 //	Exported by Cearn's GBA Image Transmogrifier, v0.9.2
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -19,8 +19,8 @@
 #ifndef GRIT_SKILLS_H
 #define GRIT_SKILLS_H
 
-#define skillsTilesLen 23424
-extern const unsigned int skillsTiles[5856];
+#define skillsTilesLen 25984
+extern const unsigned int skillsTiles[6496];
 
 #define skillsMapLen 1536
 extern const unsigned short skillsMap[768];

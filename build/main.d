@@ -60,6 +60,7 @@ main.o: \
  /opt/devkitpro/libnds/include/nds/arm9/video.h \
  /opt/devkitpro/libnds/include/nds/arm9/videoGL.h \
  /opt/devkitpro/libnds/include/nds/arm9/nand.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/start.h \
  /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/battle.h \
  /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/findDiff.h \
  /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/skills.h \
@@ -131,6 +132,7 @@ main.o: \
 /opt/devkitpro/libnds/include/nds/arm9/video.h:
 /opt/devkitpro/libnds/include/nds/arm9/videoGL.h:
 /opt/devkitpro/libnds/include/nds/arm9/nand.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/start.h:
 /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/battle.h:
 /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/findDiff.h:
 /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/skills.h:
