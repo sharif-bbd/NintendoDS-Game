@@ -29,7 +29,29 @@
 #define	SPRITE_HEIGHT	64
 
 u16 *gfx;
+
 int min, sec, msec;
+int cd_min, cd_sec, cd_msec;
+
+void countdown_ISR(){
+	if(msec <= 0){
+		msec = 999;
+		if(sec <= 0){
+			sec = 59;
+			if(min > 0){
+				min -= 1;
+			}
+		}else{
+			if(sec > 0){
+				sec -= 1;
+			}
+		}
+	}else{
+		if(msec > 0){
+			msec -=1;
+		}
+	}
+}
 
 void timer_ISR(){
 	if(msec >= 999){
@@ -50,9 +72,9 @@ void printDigit(u16* map, int number, int x, int y){
 	int i,j;
 
 	if(number >= 0 && number < 10){
-		for(i = 0; i<8;i++){
-			for(j = 0; j<4; j++){
-				map[(i + y)*32+j+x] = (number >= 0) ? (u16)(i*4+j)+32*number : 32;
+		for(i = 0; i<4;i++){
+			for(j = 0; j<2; j++){
+				map[(i + y)*32+j+x] = (number >= 0) ? (u16)(i*2+j)+8*number : 87;
 			}
 
 		}
@@ -67,46 +89,49 @@ void updateChronoDisp(u16* map,int min, int sec, int msec)
 
 	//Clear the map
 	for(tile = 0; tile <1024; tile++){
-		map[tile] = 32;
+		map[tile] = 87;
 	}
 
 	/*****MINUTES******/
 	number = min;
 	if(min > 59) min = number = -1;
 	//First digit
-	x = 0; y = 8;
+	x = 6; y = 12;
 	if(min>=0) number = min/10;
 	printDigit(map, number, x,y);
 	//Second digit
-	x = 4; y = 8;
+	x = 8; y = 12;
 	if(min>=0) number = min %10;
 	printDigit(map, number, x,y);
 
 	/*****COLON******/
-	x = 8; y = 8;
-	for(i = 0; i<8;i++){
-		for(j = 0; j<2; j++){
-			map[(i + y)*32+j+x] = (u16)(i*4+j)+32*10+2;
+
+	x = 11; y = 12;
+	for(i = 0; i<4;i++){
+		for(j = 0; j<1; j++){
+			map[(i + y)*32+j+x] = (u16)(i*2+j)+16*5+1;
 		}
 	}
+
 
 	/*****SECONDS******/
 	number = sec;
 	if(sec > 59) sec = number = -1;
 	//First digit
-	x = 10; y = 8;
+	x = 12; y = 12;
 	if(sec>=0) number = sec / 10;
 	printDigit(map, number, x,y);
 	//Second digit
-	x = 14; y = 8;
+	x = 14; y = 12;
 	if(sec>=0) number = sec % 10;
 	printDigit(map, number, x,y);
 
 	/*****POINT MSEC******/
-	x = 18; y = 8;
-	for(i = 0; i<8;i++){
-		for(j = 0; j<2; j++){
-			map[(i + y)*32+j+x] = (u16)(i*4+j)+32*10;
+
+	x = 17; y = 12;
+	for(i = 0; i<4;i++){
+		for(j = 0; j<1; j++){
+			map[(i + y)*32+j+x] = (u16)(i*2+j)+16*5;
 		}
 	}
 
@@ -114,17 +139,17 @@ void updateChronoDisp(u16* map,int min, int sec, int msec)
 	number = msec;
 	if(msec > 999) msec = number = -1;
 	//First digit
-	x = 20; y = 8;
+	x = 18; y = 12;
 	if(msec>=0) number = msec / 100;
 	printDigit(map, number, x,y);
 
 	//Second digit
-	x = 24; y = 8;
+	x = 20; y = 12;
 	if(msec>=0) number = (msec % 100) / 10;
 	printDigit(map, number, x,y);
 
 	//Third digit
-	x = 28; y = 8;
+	x = 22; y = 12;
 	if(msec>=0) number = (msec % 10) % 10;
 	printDigit(map, number, x,y);
 }
@@ -137,6 +162,17 @@ void setup_timer(){
 	TIMER_CR(0) = TIMER_ENABLE | TIMER_DIV_64 | TIMER_IRQ_REQ;
 
 	irqEnable(IRQ_TIMER0);
+}
+
+void setup_countdown(){
+	cd_min = 0;
+	cd_sec = 10;
+	cd_msec = 0;
+	irqSet(IRQ_TIMER1, &countdown_ISR);
+	TIMER_DATA(1) = TIMER_FREQ_64(1000);
+	TIMER_CR(1) = TIMER_ENABLE | TIMER_DIV_64 | TIMER_IRQ_REQ ;
+
+	irqEnable(IRQ_TIMER1);
 }
 void configureSprites() {
 	//Set up memory bank to work in sprite mode (offset since we are using VRAM A for backgrounds)
@@ -227,7 +263,7 @@ int main(void) {
 
 	/////////Configure touch screens////////
 
-
+	setup_timer();
 	for (;;) {
 		swiWaitForVBlank();
 		scanKeys();
@@ -422,7 +458,7 @@ int main(void) {
 			swiCopy(numbersPal, BG_PALETTE, numbersPalLen/2);
 			swiCopy(numbersTiles, BG_TILE_RAM(1), numbersTilesLen/2);
 
-			updateChronoDisp(BG_MAP_RAM(0), 0,  0, 0);
+			updateChronoDisp(BG_MAP_RAM(0), min,  sec, msec);
 
 			swiCopy(gameoverPal, BG_PALETTE_SUB, gameoverPalLen / 2);
 			swiCopy(gameoverTiles, BG_TILE_RAM_SUB(1), gameoverTilesLen / 2);
