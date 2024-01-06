@@ -1,5 +1,5 @@
 main.o: \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/source/main.c \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/source/main.c \
  /opt/devkitpro/libnds/include/nds.h \
  /opt/devkitpro/libnds/include/nds/libversion.h \
  /opt/devkitpro/libnds/include/nds/ndstypes.h \
@@ -60,19 +60,20 @@ main.o: \
  /opt/devkitpro/libnds/include/nds/arm9/video.h \
  /opt/devkitpro/libnds/include/nds/arm9/videoGL.h \
  /opt/devkitpro/libnds/include/nds/arm9/nand.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/start.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/battle.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/findDiff.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/skills.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/menu.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/gameover.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/instruction.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/numbers.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/start.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/battle.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/findDiff.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/maths.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/skills.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/menu.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/gameover.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/instruction.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/numbers.h \
  /opt/devkitpro/libnds/include/maxmod9.h \
  /opt/devkitpro/libnds/include/mm_types.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/soundbank.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/soundbank_bin.h \
- /Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/aspicot.h
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/soundbank.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/soundbank_bin.h \
+ /Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/aspicot.h
 /opt/devkitpro/libnds/include/nds.h:
 /opt/devkitpro/libnds/include/nds/libversion.h:
 /opt/devkitpro/libnds/include/nds/ndstypes.h:
@@ -133,16 +134,17 @@ main.o: \
 /opt/devkitpro/libnds/include/nds/arm9/video.h:
 /opt/devkitpro/libnds/include/nds/arm9/videoGL.h:
 /opt/devkitpro/libnds/include/nds/arm9/nand.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/start.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/battle.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/findDiff.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/skills.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/menu.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/gameover.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/instruction.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/numbers.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/start.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/battle.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/findDiff.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/maths.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/skills.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/menu.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/gameover.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/instruction.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/numbers.h:
 /opt/devkitpro/libnds/include/maxmod9.h:
 /opt/devkitpro/libnds/include/mm_types.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/soundbank.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/soundbank_bin.h:
-/Users/mac/Desktop/Work/BA5/EE-310/workspace-mac/flepokemon/build/aspicot.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/soundbank.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/soundbank_bin.h:
+/Users/sarajun/Desktop/EPFL/BA5/nintendo/workspace-mac/final/build/aspicot.h:

@@ -9,6 +9,7 @@
 #include "start.h"
 #include "battle.h"
 #include "findDiff.h"
+#include "maths.h"
 #include "skills.h"
 #include "menu.h"
 #include "gameover.h"
@@ -209,7 +210,7 @@ int main(void) {
 				swiCopy(menuTiles, BG_TILE_RAM_SUB(1), menuTilesLen / 2);
 
 				swiCopy(menuMap, BG_MAP_RAM_SUB(0), menuMapLen / 2);
-
+				inMenu = true;
 //
 //    //Engine configuration in tile mode
 //    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG0_ACTIVE;
@@ -268,7 +269,8 @@ int main(void) {
 //
 //				    //Confiure background
 //				    BGCTRL_SUB[0]= BG_COLOR_256 | BG_MAP_BASE(0) | BG_TILE_BASE(1) | BG_32x32;
-
+				mmEffect(SFX_RESULT);
+				inMenu = false;
 				// Transfer tiles to VRAM (chosen tile base)
 				swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen / 2);
 				swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen / 2);
@@ -278,7 +280,7 @@ int main(void) {
 				mmStart(MOD_POKECENTER, MM_PLAY_LOOP);
 
 				if ((touch.px >= 2) && (touch.px <= 123) && (touch.py >= 28)
-						&& (touch.py <= 76)) {
+						&& (touch.py <= 76) && inMenu == false) {
 
 					int x = 90, y = 100;
 					swiCopy(instructionPal, BG_PALETTE_SUB,
@@ -331,8 +333,8 @@ int main(void) {
 						}
 					}
 				}
-				if ((touch.px >= 133) && (touch.px <= 251) && (touch.py >= 28)
-						&& (touch.py <= 76)) {
+				if ((touch.px >= 133) && (touch.px <= 251) && (touch.py >= 28) && (touch.py <= 76) && (inMenu == false)) {
+					mmEffect(SFX_RESULT);
 
 					swiCopy(findDiffPal, BG_PALETTE_SUB, findDiffPalLen / 2);
 					swiCopy(findDiffTiles, BG_TILE_RAM_SUB(1),
@@ -351,6 +353,25 @@ int main(void) {
 					}
 
 				}
+				if(((touch.px >= 3) && (touch.px <= 123) && (touch.py >= 92) && (touch.py <= 141))){
+					mmEffect(SFX_RESULT);
+
+					swiCopy(mathsPal, BG_PALETTE_SUB, mathsPalLen / 2);
+					swiCopy(mathsTiles, BG_TILE_RAM_SUB(1),mathsTilesLen / 2);
+					swiCopy(mathsMap, BG_MAP_RAM_SUB(0), mathsMapLen / 2);
+										swiWaitForVBlank();
+										while (1) {
+											scanKeys();
+											keys = keysHeld();
+											if (keys & KEY_X) {
+												swiCopy(skillsPal, BG_PALETTE_SUB, skillsPalLen / 2);
+																swiCopy(skillsTiles, BG_TILE_RAM_SUB(1), skillsTilesLen / 2);
+																swiCopy(skillsMap, BG_MAP_RAM_SUB(0), skillsMapLen / 2);
+												break;
+											}
+										}
+
+				}
 			}
 
 			//}
@@ -358,6 +379,7 @@ int main(void) {
 		} else if (keys & KEY_Y) {
 
 			inMenu = true;
+			mmEffect(SFX_RESULT);
 
 //						VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
 //
@@ -382,6 +404,7 @@ int main(void) {
 			touchPosition touch;
 
 			touchRead(&touch);
+			mmEffect(SFX_RESULT);
 
 			//if((touch.px>= 1) && (touch.px <= 20)&&(touch.py >= 150) ){
 
@@ -410,6 +433,7 @@ int main(void) {
 			//
 		}
 	}
+
 
 	while (1)
 		swiWaitForVBlank();
