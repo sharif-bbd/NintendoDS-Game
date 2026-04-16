@@ -1,0 +1,1 @@
+findDiff.o: findDiff.s

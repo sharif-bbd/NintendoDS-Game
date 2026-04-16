@@ -1,0 +1,1 @@
+skills.o: skills.s
